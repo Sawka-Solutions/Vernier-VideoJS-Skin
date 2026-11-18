@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" role="img" aria-label="VERNIER-10 Optical Transport Stage">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0e14"/>
+      <stop offset="100%" stop-color="#141922"/>
+    </linearGradient>
+    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M 64 0 L 0 0 0 64" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect width="1280" height="720" fill="url(#grid)"/>
+
+  <!-- Precision optical calibration crosshairs -->
+  <g stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.2" fill="none">
+    <circle cx="640" cy="360" r="190"/>
+    <circle cx="640" cy="360" r="118" stroke-dasharray="6 8"/>
+    <line x1="280" y1="360" x2="500" y2="360"/>
+    <line x1="780" y1="360" x2="1000" y2="360"/>
+    <line x1="640" y1="110" x2="640" y2="220"/>
+    <line x1="640" y1="500" x2="640" y2="610"/>
+  </g>
+
+  <!-- Corner frame brackets -->
+  <g stroke="#ff4e2b" stroke-opacity="0.72" stroke-width="2" fill="none">
+    <path d="M 64 96 L 64 64 L 96 64"/>
+    <path d="M 1184 64 L 1216 64 L 1216 96"/>
+    <path d="M 64 624 L 64 656 L 96 656"/>
+    <path d="M 1184 656 L 1216 656 L 1216 624"/>
+  </g>
+
+  <!-- Center optical index mark -->
+  <circle cx="640" cy="360" r="6" fill="#ff4e2b"/>
+  <text x="640" y="592" text-anchor="middle" fill="#cfd6e2" fill-opacity="0.75" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" letter-spacing="4">VERNIER-10 // OPTICAL CALIBRATION STAGE</text>
+</svg>

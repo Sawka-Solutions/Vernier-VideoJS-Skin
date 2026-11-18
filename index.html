@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERNIER-10 | Optical-Transport Custom Skin for Video.js v10</title>
+  <meta
+    name="description"
+    content="VERNIER-10 is an open-source, Apache-2.0 custom skin and interactive workbench for Video.js v10 featuring a millimeter-graduated Vernier scrub rail, Mux storyboard previews, dual Obsidian/Ceramic polarity, and WCAG-first keyboard accessibility."
+  />
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%23181c22'/><rect x='3' y='3' width='3' height='10' rx='1' fill='%23ea4c2b'/></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Pinned Video.js v10 Core & Modular Skin Stylesheet -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.5.0/video-player.js"></script>
+  <link rel="stylesheet" href="./src/vernier-skin.css" />
+
+  <style>
+    /* ==========================================================================
+       VERNIER-10 Architectural Light-Table Workbench
+       Committed Showcase Tokens (L = 0.925 Cool Mineral Drafting Paper)
+       ========================================================================== */
+    :root {
+      --wb-bg: oklch(0.925 0.008 220);
+      --wb-surface: oklch(0.975 0.004 220);
+      --wb-surface-alt: oklch(0.945 0.006 220);
+      --wb-border: oklch(0.16 0.014 240 / 0.14);
+      --wb-border-strong: oklch(0.16 0.014 240 / 0.28);
+      --wb-ink: oklch(0.15 0.015 240);
+      --wb-muted: oklch(0.42 0.015 240);
+      --wb-accent: oklch(0.60 0.215 28);
+      --wb-accent-tint: oklch(0.60 0.215 28 / 0.11);
+      --wb-grid-line: oklch(0.16 0.014 240 / 0.055);
+      --wb-code-bg: oklch(0.15 0.015 240);
+      --wb-code-ink: oklch(0.95 0.006 220);
+      --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+      --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+      --ease-out-quart: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    [data-workbench-mode='darkroom'] {
+      --wb-bg: oklch(0.13 0.012 240);
+      --wb-surface: oklch(0.175 0.014 240);
+      --wb-surface-alt: oklch(0.21 0.014 240);
+      --wb-border: oklch(0.96 0.004 220 / 0.13);
+      --wb-border-strong: oklch(0.96 0.004 220 / 0.28);
+      --wb-ink: oklch(0.96 0.004 220);
+      --wb-muted: oklch(0.74 0.01 230);
+      --wb-grid-line: oklch(0.96 0.004 220 / 0.045);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background-color: var(--wb-bg);
+      color: var(--wb-ink);
+      font-family: var(--font-ui);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 220ms var(--ease-out-quart), color 220ms var(--ease-out-quart);
+    }
+
+    /* Architectural Drafting Paper Rules */
+    .drafting-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(to right, var(--wb-grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--wb-grid-line) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(circle at 46% 36%, #000 30%, transparent 92%);
+    }
+
+    /* Restrained Upper-Right Studio Calibration Horizon (never crosses prose or footer) */
+    #studio-backdrop {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: min(560px, 52vw);
+      height: 360px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.22;
+      mask-image: radial-gradient(circle at 68% 36%, #000 10%, transparent 74%);
+    }
+
+    @media (max-width: 979px) {
+      #studio-backdrop {
+        display: none;
+      }
+    }
+
+    .wb-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 40px) clamp(16px, 3vw, 32px) 64px;
+    }
+
+    /* Masthead anchored directly to left architectural datum */
+    .wb-masthead {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px 24px;
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--wb-border);
+    }
+
+    .wb-title-block {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      max-width: 68ch;
+    }
+
+    .wb-caliper-bar {
+      width: 8px;
+      height: 44px;
+      border-radius: 3px;
+      background: var(--wb-accent);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .wb-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.75rem, 3.2vw, 2.55rem);
+      letter-spacing: -0.025em;
+      line-height: 1.02;
+      margin: 0;
+      text-wrap: balance;
+    }
+
+    .wb-lead {
+      margin: 6px 0 0;
+      color: var(--wb-muted);
+      font-size: 0.96rem;
+      max-width: 66ch;
+      text-wrap: pretty;
+    }
+
+    .wb-meta-links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wb-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 6px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--wb-border-strong);
+      background: var(--wb-surface);
+      color: var(--wb-ink);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: border-color 150ms var(--ease-out-quart), background-color 150ms var(--ease-out-quart);
+    }
+
+    .wb-link-btn:focus-visible {
+      outline: 2.5px solid var(--wb-accent);
+      outline-offset: 2px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .wb-link-btn:hover {
+        border-color: var(--wb-accent);
+        background: var(--wb-accent-tint);
+      }
+    }
+
+    /* ==========================================================================
+       GRID BREAK: Asymmetric 8 / 4 Split with Plinth-Shoulder Overlapping Rail
+       ========================================================================== */
+    .wb-hero-split {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (min-width: 980px) {
+      .wb-hero-split {
+        grid-template-columns: minmax(0, 8fr) minmax(300px, 4fr);
+        gap: 0;
+      }
+    }
+
+    .wb-stage-column {
+      min-width: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .wb-stage-plinth {
+      padding: clamp(10px, 1.5vw, 18px);
+      border-radius: 18px;
+      background: var(--wb-surface-alt);
+      border: 1px solid var(--wb-border);
+      box-shadow: 0 22px 48px oklch(0.14 0.02 240 / 0.10);
+    }
+
+    @media (min-width: 980px) {
+      .wb-stage-plinth {
+        padding-right: 36px;
+      }
+    }
+
+    .wb-width-frame {
+      width: var(--stage-test-width, 100%);
+      max-width: 100%;
+      margin: 0 auto;
+      transition: width 200ms var(--ease-out-quart);
+    }
+
+    .wb-width-readout {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 0 4px;
+      font-size: 0.82rem;
+      color: var(--wb-muted);
+    }
+
+    .wb-width-readout code {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.78rem;
+      color: var(--wb-ink);
+      background: var(--wb-surface);
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid var(--wb-border);
+    }
+
+    /* Overlapping Calibration & Inspection Rail */
+    .wb-rail {
+      position: relative;
+      z-index: 5;
+      background: var(--wb-surface);
+      border: 1px solid var(--wb-border-strong);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 24px 52px oklch(0.14 0.02 240 / 0.14);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    @media (min-width: 980px) {
+      .wb-rail {
+        margin-left: -20px;
+        margin-top: 22px;
+      }
+    }
+
+    .rail-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--wb-border);
+    }
+
+    .rail-group:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .rail-section-label {
+      font-family: var(--font-ui);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--wb-muted);
+      margin: 0;
+    }
+
+    .rail-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .wb-chip {
+      appearance: none;
+      min-height: 36px;
+      padding: 6px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--wb-border);
+      background: var(--wb-surface-alt);
+      color: var(--wb-ink);
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition:
+        border-color 140ms var(--ease-out-quart),
+        background-color 140ms var(--ease-out-quart),
+        transform 120ms var(--ease-out-quart);
+    }
+
+    .wb-chip:active {
+      transform: scale(0.97);
+    }
+
+    .wb-chip:focus-visible {
+      outline: 2.5px solid var(--wb-accent);
+      outline-offset: 2px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .wb-chip:hover {
+        border-color: var(--wb-accent);
+      }
+    }
+
+    .wb-chip[aria-pressed='true'] {
+      border-color: var(--wb-accent);
+      background: var(--wb-accent-tint);
+      color: var(--wb-ink);
+    }
+
+    .wb-chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--wb-muted);
+    }
+
+    .wb-chip[aria-pressed='true'] .wb-chip-dot {
+      background: var(--wb-accent);
+    }
+
+    .wb-range {
+      width: 100%;
+      accent-color: var(--wb-accent);
+      cursor: pointer;
+    }
+
+    .wb-range:focus-visible {
+      outline: 2.5px solid var(--wb-accent);
+      outline-offset: 3px;
+    }
+
+    .wb-form {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .wb-form-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .wb-input {
+      width: 100%;
+      min-height: 38px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--wb-border-strong);
+      background: var(--wb-bg);
+      color: var(--wb-ink);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+    }
+
+    .wb-input::placeholder {
+      color: var(--wb-muted);
+      opacity: 1;
+    }
+
+    .wb-input:focus-visible {
+      outline: 2.5px solid var(--wb-accent);
+      outline-offset: 1px;
+    }
+
+    .wb-form-msg {
+      margin: 0;
+      font-size: 0.76rem;
+      color: var(--wb-accent);
+      font-weight: 600;
+    }
+
+    .wb-file-label {
+      cursor: pointer;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .wb-file-label:focus-within {
+      outline: 2.5px solid var(--wb-accent);
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================================
+       BELOW-STAGE SPECIFICATION LEDGER & CODE INSPECTOR (Non-Card Architecture)
+       ========================================================================== */
+    .wb-docs-band {
+      position: relative;
+      z-index: 2;
+      margin-top: 38px;
+      padding-top: 28px;
+      border-top: 1px solid var(--wb-border);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    @media (min-width: 900px) {
+      .wb-docs-band {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+        gap: 36px;
+      }
+    }
+
+    .wb-section-heading {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(1.25rem, 2vw, 1.55rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0 0 10px;
+      text-wrap: balance;
+    }
+
+    .wb-prose {
+      margin: 0 0 16px;
+      font-size: 0.94rem;
+      color: var(--wb-muted);
+      max-width: 65ch;
+      text-wrap: pretty;
+    }
+
+    .wb-spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .wb-spec-table th,
+    .wb-spec-table td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--wb-border);
+      vertical-align: top;
+    }
+
+    .wb-spec-table th {
+      font-weight: 700;
+      color: var(--wb-ink);
+      width: 36%;
+    }
+
+    .wb-spec-table td {
+      color: var(--wb-muted);
+    }
+
+    .wb-spec-table code {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--wb-ink);
+      background: var(--wb-surface);
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--wb-border);
+    }
+
+    /* Copyable Code Inspector */
+    .wb-code-shell {
+      border-radius: 14px;
+      border: 1px solid var(--wb-border-strong);
+      background: var(--wb-code-bg);
+      color: var(--wb-code-ink);
+      overflow: hidden;
+    }
+
+    .wb-code-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid oklch(0.96 0.004 220 / 0.14);
+      background: oklch(0.19 0.015 240);
+    }
+
+    .wb-tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .wb-tab {
+      appearance: none;
+      min-height: 32px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: oklch(0.76 0.01 230);
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .wb-tab[aria-selected='true'] {
+      background: oklch(0.60 0.215 28 / 0.22);
+      border-color: oklch(0.60 0.215 28);
+      color: #ffffff;
+    }
+
+    .wb-tab:focus-visible,
+    .wb-copy-btn:focus-visible {
+      outline: 2.5px solid var(--wb-accent);
+      outline-offset: 2px;
+    }
+
+    .wb-copy-btn {
+      appearance: none;
+      min-height: 32px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid oklch(0.96 0.004 220 / 0.24);
+      background: oklch(0.24 0.015 240);
+      color: #ffffff;
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .wb-code-pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: oklch(0.94 0.006 220);
+      max-height: 340px;
+    }
+
+    .wb-footer {
+      position: relative;
+      z-index: 2;
+      margin-top: 40px;
+      padding-top: 18px;
+      border-top: 1px solid var(--wb-border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: var(--wb-muted);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 120ms !important;
+        animation-duration: 0.01ms !important;
+      }
+      #studio-backdrop {
+        opacity: 0.14;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="drafting-grid" aria-hidden="true"></div>
+  <canvas id="studio-backdrop" aria-hidden="true"></canvas>
+
+  <main class="wb-shell">
+    <header class="wb-masthead">
+      <div class="wb-title-block">
+        <div class="wb-caliper-bar" aria-hidden="true"></div>
+        <div>
+          <h1 class="wb-title">VERNIER-10</h1>
+          <p class="wb-lead">
+            Tactile precision optical-transport skin built on Video.js v10 composable Web Components. Engineered for Mux adaptive HLS, storyboard frame loupes, and full keyboard accessibility across snow glare and dark cinema footage.
+          </p>
+        </div>
+      </div>
+
+      <nav class="wb-meta-links" aria-label="Repository resources">
+        <a class="wb-link-btn" href="./src/vernier-skin.css" target="_blank" rel="noopener">vernier-skin.css</a>
+        <a class="wb-link-btn" href="./src/vernier-skin.js" target="_blank" rel="noopener">vernier-skin.js</a>
+        <a class="wb-link-btn" href="./src/vernier-skin.react.tsx" target="_blank" rel="noopener">React Adapter</a>
+        <a class="wb-link-btn" href="./README.md" target="_blank" rel="noopener">Docs</a>
+      </nav>
+    </header>
+
+    <section class="wb-hero-split" aria-label="Player stage and calibration controls">
+      <!-- Primary 8-Col Optical Stage -->
+      <div class="wb-stage-column">
+        <div class="wb-stage-plinth">
+          <div class="wb-width-frame" id="width-frame">
+            <!-- auteur-allow: VIDEO_NO_POSTER -- <video-player> is a boxless Video.js v10 state provider; poster is authored on inner <mux-video> and <media-poster> -->
+            <video-player class="vernier-player" id="vjs-player">
+              <media-container class="vernier-stage is-paused is-pristine" id="vjs-stage" data-vernier-polarity="obsidian">
+                <mux-video
+                  id="vjs-media"
+                  src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8"
+                  poster="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp?time=2"
+                  playsinline
+                  preload="metadata"
+                  crossorigin="anonymous"
+                ></mux-video>
+
+                <media-poster class="vernier-poster">
+                  <img
+                    src="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp?time=2"
+                    onerror="this.onerror=null;this.src='./assets/poster-cinema.svg';"
+                    alt="Video preview frame"
+                    decoding="async"
+                  />
+                </media-poster>
+
+                <!-- Video.js v10 Pointer Gestures -->
+                <media-gesture class="vernier-gesture" type="tap" action="togglePaused" pointer="mouse" region="center"></media-gesture>
+                <media-gesture class="vernier-gesture" type="doubletap" action="seekStep" value="-10" region="left"></media-gesture>
+                <media-gesture class="vernier-gesture" type="doubletap" action="toggleFullscreen" region="center"></media-gesture>
+                <media-gesture class="vernier-gesture" type="doubletap" action="seekStep" value="10" region="right"></media-gesture>
+
+                <!-- Video.js v10 Keyboard Shortcuts -->
+                <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+                <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+                <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+                <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+                <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
+                <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
+                <media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
+                <media-hotkey keys="j" action="seekStep" value="-10"></media-hotkey>
+                <media-hotkey keys="l" action="seekStep" value="10"></media-hotkey>
+                <media-hotkey keys="ArrowUp" action="volumeStep" value="0.05"></media-hotkey>
+                <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.05"></media-hotkey>
+                <media-hotkey keys="0-9" action="seekToPercent"></media-hotkey>
+
+                <!-- Accessible Status Live Region -->
+                <media-status-announcer class="vernier-status-announcer"></media-status-announcer>
+
+                <div class="vernier-scrim" aria-hidden="true"></div>
+
+                <div class="vernier-reticles" aria-hidden="true">
+                  <span class="vernier-reticle tl"></span>
+                  <span class="vernier-reticle tr"></span>
+                  <span class="vernier-reticle bl"></span>
+                  <span class="vernier-reticle br"></span>
+                </div>
+
+                <div class="vernier-hud-top">
+                  <div class="vernier-tally-pill">
+                    <span class="vernier-tally-led" aria-hidden="true"></span>
+                    <span id="hud-state-text" class="vernier-tally-label">STANDBY</span>
+                  </div>
+                  <div class="vernier-stream-badge" id="hud-stream-badge">MUX HLS · STORYBOARD</div>
+                </div>
+
+                <div class="vernier-center-aperture">
+                  <media-play-button class="vernier-aperture-btn" id="center-play-btn" aria-label="Play video" data-paused>
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <polygon points="7,4 20,12 7,20"></polygon>
+                    </svg>
+                  </media-play-button>
+                </div>
+
+                <media-buffering-indicator class="vernier-buffer" aria-label="Buffering">
+                  <span class="vernier-buffer-ring" aria-hidden="true"></span>
+                </media-buffering-indicator>
+
+                <media-controls class="vernier-controls">
+                  <media-controls-backdrop></media-controls-backdrop>
+                  <media-controls-content class="vernier-controls-content" data-visible>
+                    <media-tooltip-group delay="450" close-delay="100" timeout="600">
+                      <div class="vernier-deck">
+                        <!-- Millimeter-Graduated Vernier Scrub Rail -->
+                        <div class="vernier-rail-wrap">
+                          <media-time-slider
+                            class="vernier-slider"
+                            aria-label="Seek timeline"
+                            tabindex="0"
+                            role="slider"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="0"
+                          >
+                            <media-time-slider-chapters class="vernier-chapters">
+                              <template>
+                                <div class="vernier-chapter">
+                                  <media-slider-track class="vernier-track">
+                                    <media-slider-buffer class="vernier-buffer-bar"></media-slider-buffer>
+                                    <media-slider-fill class="vernier-fill"></media-slider-fill>
+                                  </media-slider-track>
+                                </div>
+                              </template>
+                            </media-time-slider-chapters>
+                            <media-slider-thumb class="vernier-thumb"></media-slider-thumb>
+                            <media-slider-preview class="vernier-loupe">
+                              <media-slider-thumbnail class="vernier-loupe-thumb"></media-slider-thumbnail>
+                              <div class="vernier-loupe-meta">
+                                <media-time-slider-chapter-title class="vernier-loupe-chapter"></media-time-slider-chapter-title>
+                                <media-slider-value class="vernier-loupe-val" type="pointer">0:00</media-slider-value>
+                              </div>
+                            </media-slider-preview>
+                          </media-time-slider>
+                        </div>
+
+                        <media-controls-group class="vernier-controls-row">
+                          <div class="vernier-cluster">
+                            <media-play-button class="v-ctrl vernier-play" commandfor="tt-play" aria-label="Play" data-paused>
+                              <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                                <polygon points="7,5 19,12 7,19" fill="currentColor" stroke="none"></polygon>
+                              </svg>
+                              <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="6.5" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none"></rect>
+                                <rect x="13.5" y="5" width="4" height="14" rx="1" fill="currentColor" stroke="none"></rect>
+                              </svg>
+                              <svg class="icon-replay" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
+                                <path d="M3 3v5h5"></path>
+                              </svg>
+                            </media-play-button>
+                            <media-tooltip id="tt-play" class="vernier-tooltip" side="top" boundary="container">Play / Pause (K)</media-tooltip>
+
+                            <media-seek-button class="v-ctrl vernier-seek-btn" seconds="-10" commandfor="tt-back" aria-label="Seek back 10 seconds">
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M11 17l-5-5 5-5"></path>
+                                <path d="M18 17l-5-5 5-5"></path>
+                              </svg>
+                              <span class="v-seek-tag" aria-hidden="true">10</span>
+                            </media-seek-button>
+                            <media-tooltip id="tt-back" class="vernier-tooltip" side="top" boundary="container">Back 10s (J)</media-tooltip>
+
+                            <media-seek-button class="v-ctrl vernier-seek-btn" seconds="10" commandfor="tt-fwd" aria-label="Seek forward 10 seconds">
+                              <span class="v-seek-tag" aria-hidden="true">10</span>
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M13 17l5-5-5-5"></path>
+                                <path d="M6 17l5-5-5-5"></path>
+                              </svg>
+                            </media-seek-button>
+                            <media-tooltip id="tt-fwd" class="vernier-tooltip" side="top" boundary="container">Forward 10s (L)</media-tooltip>
+
+                            <div class="vernier-volume-group">
+                              <media-mute-button class="v-ctrl vernier-mute" commandfor="tt-mute" aria-label="Mute">
+                                <svg class="icon-vol-high" viewBox="0 0 24 24" aria-hidden="true">
+                                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                                </svg>
+                                <svg class="icon-vol-low" viewBox="0 0 24 24" aria-hidden="true">
+                                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                </svg>
+                                <svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+                                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                  <line x1="22" y1="9" x2="16" y2="15"></line>
+                                  <line x1="16" y1="9" x2="22" y2="15"></line>
+                                </svg>
+                              </media-mute-button>
+                              <media-tooltip id="tt-mute" class="vernier-tooltip" side="top" boundary="container">Mute (M)</media-tooltip>
+
+                              <media-volume-slider
+                                class="vernier-vol-slider"
+                                aria-label="Volume"
+                                tabindex="0"
+                                role="slider"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-valuenow="100"
+                              >
+                                <media-slider-track class="vernier-vol-track">
+                                  <media-slider-fill class="vernier-vol-fill"></media-slider-fill>
+                                </media-slider-track>
+                                <media-slider-thumb class="vernier-vol-thumb"></media-slider-thumb>
+                              </media-volume-slider>
+                            </div>
+
+                            <media-time-group class="vernier-time-group" aria-label="Time progress">
+                              <media-time class="vernier-time-toggle" type="current" toggle title="Click to toggle elapsed / remaining time"></media-time>
+                              <media-time-separator class="vernier-sep">/</media-time-separator>
+                              <media-time class="vernier-time-duration" type="duration"></media-time>
+                            </media-time-group>
+                          </div>
+
+                          <div class="vernier-cluster">
+                            <div class="vernier-speed-wrap">
+                              <media-playback-rate-button
+                                class="v-ctrl vernier-rate"
+                                commandfor="vernier-speed-menu"
+                                aria-label="Playback speed"
+                                data-rate="1"
+                              ></media-playback-rate-button>
+                              <media-menu id="vernier-speed-menu" class="vernier-menu" side="top" align="end" boundary="container">
+                                <media-menu-content class="vernier-menu-content">
+                                  <media-playback-rate-radio-group aria-label="Playback speed">
+                                    <template>
+                                      <media-menu-radio-item class="vernier-menu-item">
+                                        <span data-part="label"></span>
+                                        <media-menu-item-indicator></media-menu-item-indicator>
+                                      </media-menu-radio-item>
+                                    </template>
+                                  </media-playback-rate-radio-group>
+                                </media-menu-content>
+                              </media-menu>
+                            </div>
+
+                            <media-captions-button class="v-ctrl vernier-cc" commandfor="tt-cc" aria-label="Toggle captions">
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect>
+                                <path d="M10 10.2a2.2 2.2 0 1 0 0 3.6"></path>
+                                <path d="M16.5 10.2a2.2 2.2 0 1 0 0 3.6"></path>
+                              </svg>
+                              <span class="vernier-cc-bar" aria-hidden="true"></span>
+                            </media-captions-button>
+                            <media-tooltip id="tt-cc" class="vernier-tooltip" side="top" boundary="container">Captions (C)</media-tooltip>
+
+                            <media-pip-button class="v-ctrl vernier-pip" commandfor="tt-pip" aria-label="Picture in Picture">
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="2.5" y="4.5" width="19" height="15" rx="2"></rect>
+                                <rect x="11.5" y="11" width="7.5" height="5.5" rx="1" fill="currentColor" stroke="none"></rect>
+                              </svg>
+                            </media-pip-button>
+                            <media-tooltip id="tt-pip" class="vernier-tooltip" side="top" boundary="container">Picture in Picture</media-tooltip>
+
+                            <media-fullscreen-button class="v-ctrl vernier-fs" commandfor="tt-fs" aria-label="Fullscreen">
+                              <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
+                                <path d="M16 3h3a2 2 0 0 1 2 2v3"></path>
+                                <path d="M8 21H5a2 2 0 0 1-2-2v-3"></path>
+                                <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
+                              </svg>
+                              <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 9h4V5"></path>
+                                <path d="M20 9h-4V5"></path>
+                                <path d="M4 15h4v4"></path>
+                                <path d="M20 15h-4v4"></path>
+                              </svg>
+                            </media-fullscreen-button>
+                            <media-tooltip id="tt-fs" class="vernier-tooltip" side="top" boundary="container">Fullscreen (F)</media-tooltip>
+                          </div>
+                        </media-controls-group>
+                      </div>
+                    </media-tooltip-group>
+                  </media-controls-content>
+                </media-controls>
+
+                <media-error-dialog>
+                  <media-dialog-backdrop class="vernier-dialog-backdrop"></media-dialog-backdrop>
+                  <media-dialog-popup class="vernier-dialog-popup">
+                    <media-dialog-title class="vernier-dialog-title">Playback Signal Interrupted</media-dialog-title>
+                    <media-dialog-description class="vernier-dialog-desc"></media-dialog-description>
+                    <media-dialog-close class="vernier-dialog-close">Dismiss</media-dialog-close>
+                  </media-dialog-popup>
+                </media-error-dialog>
+              </media-container>
+            </video-player>
+          </div>
+
+          <div class="wb-width-readout">
+            <span>Container Query Slot: <code id="width-badge">100% (Full Studio)</code></span>
+            <span>Drop any local <code>.mp4</code> / <code>.webm</code> onto the player or paste a Mux Playback ID.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overlapping 4-Col Calibration & Inspection Rail -->
+      <aside class="wb-rail" aria-label="Calibration and inspection controls">
+        <div class="rail-group">
+          <h2 class="rail-section-label">Chassis Polarity &amp; Stage</h2>
+          <div class="rail-btn-row">
+            <button type="button" class="wb-chip polarity-btn" data-polarity="obsidian" aria-pressed="true">
+              <span class="wb-chip-dot" aria-hidden="true"></span>
+              Obsidian
+            </button>
+            <button type="button" class="wb-chip polarity-btn" data-polarity="ceramic" aria-pressed="false">
+              <span class="wb-chip-dot" aria-hidden="true"></span>
+              Ceramic
+            </button>
+            <button type="button" class="wb-chip" id="btn-workbench-mode" aria-pressed="false">
+              <span class="wb-chip-dot" aria-hidden="true"></span>
+              Darkroom
+            </button>
+          </div>
+        </div>
+
+        <div class="rail-group">
+          <h2 class="rail-section-label">Container Width Stress</h2>
+          <div class="rail-btn-row">
+            <button type="button" class="wb-chip width-preset" data-width="320" aria-pressed="false">320px</button>
+            <button type="button" class="wb-chip width-preset" data-width="480" aria-pressed="false">480px</button>
+            <button type="button" class="wb-chip width-preset" data-width="640" aria-pressed="false">640px</button>
+            <button type="button" class="wb-chip width-preset" data-width="full" aria-pressed="true">100%</button>
+          </div>
+          <label class="sr-only" for="width-range">Container width in pixels</label>
+          <input
+            id="width-range"
+            class="wb-range"
+            type="range"
+            min="320"
+            max="840"
+            value="840"
+          />
+        </div>
+
+        <div class="rail-group">
+          <h2 class="rail-section-label">Footage Luminance Sim</h2>
+          <div class="rail-btn-row">
+            <button type="button" class="wb-chip sim-btn" data-sim="natural" aria-pressed="true">Natural</button>
+            <button type="button" class="wb-chip sim-btn" data-sim="glare" aria-pressed="false">Snow Glare</button>
+            <button type="button" class="wb-chip sim-btn" data-sim="crush" aria-pressed="false">Night Crush</button>
+          </div>
+        </div>
+
+        <div class="rail-group">
+          <h2 class="rail-section-label">Sample Reels &amp; Mux</h2>
+          <div class="rail-btn-row">
+            <button
+              type="button"
+              class="wb-chip source-preset"
+              data-src="mux:BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM"
+              data-poster="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp?time=2"
+              aria-pressed="true"
+            >
+              Mux Studio HLS
+            </button>
+            <button
+              type="button"
+              class="wb-chip source-preset"
+              data-src="mux:VZtzUzGRv02OhRnZCxcNg49OilvolTqdnFLEqBsTwaxU"
+              data-poster="https://image.mux.com/VZtzUzGRv02OhRnZCxcNg49OilvolTqdnFLEqBsTwaxU/thumbnail.webp?time=2"
+              aria-pressed="false"
+            >
+              Mux Keynote
+            </button>
+            <button
+              type="button"
+              class="wb-chip source-preset"
+              data-src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
+              data-poster="./assets/poster-cinema.svg"
+              data-badge="MP4 · SINTEL DARK CINEMA"
+              aria-pressed="false"
+            >
+              Dark Cinema
+            </button>
+            <button
+              type="button"
+              class="wb-chip source-preset"
+              data-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+              data-poster="./assets/poster-daylight.svg"
+              data-badge="MP4 · DAYLIGHT CC0"
+              aria-pressed="false"
+            >
+              Daylight MP4
+            </button>
+          </div>
+
+          <form class="wb-form" id="url-form" novalidate>
+            <label class="sr-only" for="custom-source-input">Mux Playback ID or video URL</label>
+            <div class="wb-form-row">
+              <input
+                id="custom-source-input"
+                class="wb-input"
+                type="text"
+                placeholder="Mux Playback ID or .m3u8 / .mp4 URL"
+              />
+              <button type="submit" class="wb-chip">Load</button>
+            </div>
+            <p class="wb-form-msg" id="source-error" hidden>Enter a valid Mux Playback ID or http(s) media URL.</p>
+          </form>
+
+          <label class="wb-chip wb-file-label" for="local-file-input">
+            Load Local Video File
+            <input id="local-file-input" class="sr-only" type="file" accept="video/*,audio/*" />
+          </label>
+        </div>
+
+        <div class="rail-group">
+          <h2 class="rail-section-label">Tactile Feedback</h2>
+          <div class="rail-btn-row">
+            <button type="button" class="wb-chip" id="btn-sfx" aria-pressed="true">
+              <span class="wb-chip-dot" aria-hidden="true"></span>
+              Mechanical Clicks
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="wb-docs-band" aria-label="Architecture specifications and copyable markup">
+      <div>
+        <h2 class="wb-section-heading">Skin Architecture &amp; Controls</h2>
+        <p class="wb-prose">
+          VERNIER-10 styles Video.js v10 custom elements and <code>@videojs/react</code> components via shared light-DOM classes, OKLCH design tokens, public <code>--media-*</code> properties, and container queries.
+        </p>
+
+        <table class="wb-spec-table">
+          <thead>
+            <tr>
+              <th scope="col">Capability</th>
+              <th scope="col">Implementation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Media Engines</th>
+              <td>Native <code>&lt;video&gt;</code>, Mux <code>&lt;mux-video&gt;</code>, and <code>&lt;hlsjs-video&gt;</code> via <code>@videojs/cdn@10.5.0</code></td>
+            </tr>
+            <tr>
+              <th scope="row">Timeline Loupe</th>
+              <td><code>&lt;media-time-slider-chapters&gt;</code>, <code>&lt;media-slider-thumbnail&gt;</code>, chapter title, and tabular pointer value</td>
+            </tr>
+            <tr>
+              <th scope="row">Keyboard Matrix</th>
+              <td><code>Space</code> / <code>K</code> play, <code>J</code> / <code>L</code> seek 10s, <code>Arrow</code> scrub &amp; volume, <code>M</code> mute, <code>C</code> captions, <code>F</code> fullscreen, <code>0-9</code> jump</td>
+            </tr>
+            <tr>
+              <th scope="row">Touch &amp; Focus</th>
+              <td>Minimum <code>44px</code> hit areas via <code>@container vernier-player</code> reflow, <code>&lt;media-status-announcer&gt;</code>, and dual-ring <code>:focus-visible</code> halos</td>
+            </tr>
+            <tr>
+              <th scope="row">Reduced Motion</th>
+              <td>Opacity-only transitions, static buffering ring, <code>prefers-contrast: more</code> boost, and disabled Web Audio / WebGL motion</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2 class="wb-section-heading">Drop-In Integration</h2>
+        <p class="wb-prose">
+          Copy the HTML custom-element markup, CSS token sheet (with standard <code>--media-*</code> properties), or React <code>@videojs/react</code> wrapper straight into your application.
+        </p>
+
+        <div class="wb-code-shell">
+          <div class="wb-code-bar">
+            <div class="wb-tab-list" role="tablist" aria-label="Integration snippet format">
+              <button type="button" class="wb-tab" role="tab" id="tab-html" aria-selected="true" data-snippet="html">HTML + CDN</button>
+              <button type="button" class="wb-tab" role="tab" id="tab-tokens" aria-selected="false" data-snippet="tokens">CSS Tokens</button>
+              <button type="button" class="wb-tab" role="tab" id="tab-react" aria-selected="false" data-snippet="react">React TSX</button>
+            </div>
+            <button type="button" class="wb-copy-btn" id="btn-copy-snippet">Copy Snippet</button>
+          </div>
+          <pre class="wb-code-pre"><code id="code-snippet-view"></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <footer class="wb-footer">
+      <span>VERNIER-10 for Video.js v10 · Built with <code>@videojs/cdn@10.5.0</code>, <code>@videojs/html</code>, and <code>@videojs/react</code></span>
+      <span>Apache-2.0 Open Source License</span>
+    </footer>
+  </main>
+
+  <script type="module">
+    import {
+      loadVideoJsV10Elements,
+      attachVernierSkin,
+      createVernierAudio,
+      parseMuxPlaybackId,
+    } from './src/vernier-skin.js';
+    import { OpticalStage3D } from './src/stage/opticalStage3d.js';
+
+    const SNIPPETS = {
+      html: `<link rel="stylesheet" href="./src/vernier-skin.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.5.0/video-player.js"><\/script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.5.0/media/mux-video.js"><\/script>
+
+<video-player class="vernier-player" id="vjs-player">
+  <media-container class="vernier-stage is-paused" data-vernier-polarity="obsidian">
+    <mux-video
+      src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8"
+      poster="https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp?time=2"
+      playsinline
+      crossorigin="anonymous"
+    ></mux-video>
+    <!-- See src/vernier-skin.html for full controls, announcer & loupe deck -->
+  </media-container>
+</video-player>
+
+<script type="module">
+  import { loadVideoJsV10Elements, attachVernierSkin } from './src/vernier-skin.js';
+  await loadVideoJsV10Elements();
+  attachVernierSkin(document.getElementById('vjs-player'));
+<\/script>`,
+      tokens: `:root {
+  /* Standard Video.js v10 public skin properties */
+  --media-accent-color: oklch(0.60 0.215 28);
+  --media-accent-text-color: #ffffff;
+  --media-border-radius: 14px;
+}
+
+/* Switch chassis to Daylight Ceramic on any stage container */
+[data-vernier-polarity="ceramic"] {
+  --vernier-surface: oklch(0.96 0.006 220 / 0.96);
+  --vernier-ink: oklch(0.14 0.012 240);
+  --vernier-rim: oklch(0.14 0.012 240 / 0.24);
+}`,
+      react: `import { VernierPlayer } from './src/vernier-skin.react';
+
+export function ShowcasePlayer() {
+  return (
+    <VernierPlayer
+      muxPlaybackId="BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM"
+      polarity="obsidian"
+    />
+  );
+}`,
+    };
+
+    const codeView = document.getElementById('code-snippet-view');
+    let activeSnippetKey = 'html';
+    if (codeView) codeView.textContent = SNIPPETS.html;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const audio = createVernierAudio(!reducedMotion);
+    const btnSfx = document.getElementById('btn-sfx');
+    if (btnSfx) btnSfx.setAttribute('aria-pressed', String(!reducedMotion));
+
+    /* Boot Video.js v10 UI custom elements + attach VERNIER-10 skin */
+    await loadVideoJsV10Elements();
+
+    const studioRig = new OpticalStage3D(document.getElementById('studio-backdrop'));
+    studioRig.init('#e84824');
+
+    const skin = attachVernierSkin(document.getElementById('vjs-player'), {
+      audio,
+      onStateChange(st) {
+        studioRig.setPlaying(!st.paused);
+      },
+    });
+
+    /* Polarity Switcher */
+    document.querySelectorAll('.polarity-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (e.detail > 0) audio.playClick(1500);
+        const pol = btn.dataset.polarity;
+        skin.setPolarity(pol);
+        document.querySelectorAll('.polarity-btn').forEach((b) => {
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+      });
+    });
+
+    /* Darkroom vs Light Table Workbench Mode */
+    const btnMode = document.getElementById('btn-workbench-mode');
+    btnMode?.addEventListener('click', (e) => {
+      if (e.detail > 0) audio.playClick(1500);
+      const darkroom = document.documentElement.getAttribute('data-workbench-mode') === 'darkroom';
+      if (darkroom) document.documentElement.removeAttribute('data-workbench-mode');
+      else document.documentElement.setAttribute('data-workbench-mode', 'darkroom');
+      btnMode.setAttribute('aria-pressed', String(!darkroom));
+    });
+
+    /* Container Width Stress Tester */
+    const widthFrame = document.getElementById('width-frame');
+    const widthBadge = document.getElementById('width-badge');
+    const widthRange = document.getElementById('width-range');
+
+    function applyTestWidth(mode) {
+      if (!widthFrame || !widthBadge) return;
+      if (mode === 'full') {
+        widthFrame.style.setProperty('--stage-test-width', '100%');
+        widthBadge.textContent = '100% (Full Studio)';
+        if (widthRange) widthRange.value = '840';
+      } else {
+        const px = Math.max(320, Math.min(840, Number(mode)));
+        widthFrame.style.setProperty('--stage-test-width', `${px}px`);
+        const tier = px <= 440 ? 'Compact <= 440px' : px <= 600 ? 'Mid <= 600px' : 'Wide > 600px';
+        widthBadge.textContent = `${px}px (${tier})`;
+        if (widthRange) widthRange.value = String(px);
+      }
+    }
+
+    document.querySelectorAll('.width-preset').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (e.detail > 0) audio.playClick(1620);
+        document.querySelectorAll('.width-preset').forEach((b) => {
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+        applyTestWidth(btn.dataset.width);
+      });
+    });
+
+    widthRange?.addEventListener('input', (e) => {
+      const val = Number(e.target.value);
+      document.querySelectorAll('.width-preset').forEach((b) => {
+        b.setAttribute('aria-pressed', String(val >= 840 ? b.dataset.width === 'full' : Number(b.dataset.width) === val));
+      });
+      applyTestWidth(val >= 840 ? 'full' : val);
+    });
+
+    /* Luminance Simulator */
+    document.querySelectorAll('.sim-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (e.detail > 0) audio.playClick(1550);
+        skin.setLuminanceSim(btn.dataset.sim);
+        document.querySelectorAll('.sim-btn').forEach((b) => {
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+      });
+    });
+
+    /* Sample Reel Switcher & Custom Mux / URL / Local File Loader */
+    const sourceError = document.getElementById('source-error');
+    const customInput = document.getElementById('custom-source-input');
+
+    document.querySelectorAll('.source-preset').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (e.detail > 0) audio.playClick(1680);
+        if (sourceError) sourceError.hidden = true;
+        document.querySelectorAll('.source-preset').forEach((b) => {
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+        skin.loadSource(btn.dataset.src, {
+          poster: btn.dataset.poster,
+          badge: btn.dataset.badge,
+        });
+      });
+    });
+
+    document.getElementById('url-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = customInput?.value.trim() || '';
+      const isMux = Boolean(parseMuxPlaybackId(val));
+      const isHttp = /^https?:\/\/.+/i.test(val);
+      if (!val || (!isMux && !isHttp)) {
+        if (sourceError) sourceError.hidden = false;
+        customInput?.focus();
+        return;
+      }
+      if (sourceError) sourceError.hidden = true;
+      document.querySelectorAll('.source-preset').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      skin.loadSource(val);
+    });
+
+    document.getElementById('local-file-input')?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (sourceError) sourceError.hidden = true;
+      document.querySelectorAll('.source-preset').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      skin.loadSource(URL.createObjectURL(file), {
+        badge: file.name.slice(0, 22).toUpperCase(),
+      });
+      e.target.value = '';
+    });
+
+    /* Tactile Clicks Toggle */
+    btnSfx?.addEventListener('click', () => {
+      const next = !audio.isEnabled();
+      audio.setEnabled(next);
+      btnSfx.setAttribute('aria-pressed', String(next));
+      if (next) audio.playClick(1800);
+    });
+
+    /* Code Snippet Tabs & Clipboard Copy */
+    document.querySelectorAll('.wb-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        activeSnippetKey = tab.dataset.snippet || 'html';
+        document.querySelectorAll('.wb-tab').forEach((t) => {
+          t.setAttribute('aria-selected', String(t === tab));
+        });
+        if (codeView) codeView.textContent = SNIPPETS[activeSnippetKey];
+      });
+    });
+
+    const copyBtn = document.getElementById('btn-copy-snippet');
+    copyBtn?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(SNIPPETS[activeSnippetKey]);
+        copyBtn.textContent = 'Copied';
+        setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1600);
+      } catch {
+        copyBtn.textContent = 'Copy failed';
+        setTimeout(() => { copyBtn.textContent = 'Copy Snippet'; }, 1600);
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      studioRig.dispose();
+      skin.destroy();
+    });
+  </script>
+</body>
+</html>

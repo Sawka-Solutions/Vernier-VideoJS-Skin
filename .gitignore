@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+shots/
+coverage/
+tmp/
+.tmp/
+.env
+.env.*
+*.tsbuildinfo
+*.log
+.DS_Store
+Thumbs.db
+.vercel/
+.netlify/
+.vscode/
+.idea/

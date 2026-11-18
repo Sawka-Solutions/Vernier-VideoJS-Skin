@@ -1,0 +1,66 @@
+{
+  "name": "vernier-videojs-skin",
+  "version": "1.0.0",
+  "description": "VERNIER-10 — Tactile precision optical-transport custom skin and workbench for Video.js v10",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/vernier-skin.js",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/vernier-skin.js",
+    "./css": "./src/vernier-skin.css",
+    "./react": "./src/vernier-skin.react.tsx",
+    "./html": "./src/vernier-skin.html",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src/",
+    "assets/",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "check": "node --check src/vernier-skin.js && node --check src/stage/opticalStage3d.js",
+    "dev": "npx serve -l 4173 .",
+    "start": "npx serve -l 4173 .",
+    "preview": "npx serve -l 4173 .",
+    "deploy": "npx vercel --prod",
+    "deploy:netlify": "npx netlify-cli deploy --prod --dir=."
+  },
+  "peerDependencies": {
+    "@videojs/html": "^10.5.0",
+    "@videojs/mux-video": "^10.5.0",
+    "@videojs/react": "^10.5.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@videojs/html": {
+      "optional": true
+    },
+    "@videojs/mux-video": {
+      "optional": true
+    },
+    "@videojs/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "videojs",
+    "videojs-v10",
+    "videojs-skin",
+    "mux",
+    "mux-video",
+    "web-components",
+    "react",
+    "accessibility"
+  ]
+}
