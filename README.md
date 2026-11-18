@@ -2,9 +2,9 @@
 
 **A tactile, precision optical-transport custom skin and inspection workbench for Video.js v10.**
 
-VERNIER-10 styles Video.js v10 composable Web Components (`@videojs/html`, `@videojs/cdn@10.5.0`) and `@videojs/react` primitives with solid anodized ceramic control decks, a millimeter-graduated Vernier timeline rail, Mux storyboard frame loupes, and dual Obsidian / Daylight Ceramic polarity.
+**[Live Demo Workbench](https://sawka-solutions.github.io/Vernier-VideoJS-Skin/)** · **License:** [Apache-2.0](./LICENSE)
 
-Licensed under **Apache-2.0**.
+VERNIER-10 styles Video.js v10 composable Web Components (`@videojs/html`, `@videojs/cdn@10.5.0`) and `@videojs/react` primitives with solid anodized ceramic control decks, a millimeter-graduated Vernier timeline rail, Mux storyboard frame loupes, and dual Obsidian / Daylight Ceramic polarity.
 
 ---
 
